@@ -34,13 +34,13 @@ $updateProfile = function () {
     $this->dispatch('profile-updated');
 };
 
-$profileImageUrl = computed(function () {
+$getProfileImageUrl = function () {
     if ($this->profile_image) {
         return $this->profile_image->temporaryUrl();
     }
 
     return $this->current_profile_image ? Storage::url($this->current_profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
-});
+};
 
 ?>
 
@@ -59,7 +59,7 @@ $profileImageUrl = computed(function () {
                     </label>
                     <div class="flex items-center space-x-6">
                         <div class="shrink-0">
-                            <img src="{{ $profileImageUrl }}" alt="{{ $name }}"
+                            <img src="{{ $this->getProfileImageUrl() }}" alt="{{ $name }}"
                                 class="h-16 w-16 object-cover rounded-full">
                         </div>
                         <label class="block">
