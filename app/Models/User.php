@@ -76,4 +76,16 @@ class User extends Authenticatable
 
         return mb_strtoupper($initials);
     }
+
+    /**
+     * プロフィール画像のURLを取得
+     */
+    public function getProfileImageUrlAttribute(): string
+    {
+        if ($this->profile_image) {
+            return asset('storage/' . $this->profile_image);
+        }
+
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
 }
