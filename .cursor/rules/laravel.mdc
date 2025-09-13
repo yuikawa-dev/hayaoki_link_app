@@ -1,0 +1,268 @@
+# Laravelフレームワークルール
+
+## 目的
+「はやおきリンク」のLaravel開発における標準的な実装方法とベストプラクティスを定義します。
+
+## ディレクトリ構造
+
+### 基本ディレクトリ
+```
+app/
+├── Http/
+│   ├── Controllers/    # コントローラー
+│   ├── Middleware/     # ミドルウェア
+│   └── Requests/       # フォームリクエスト
+├── Models/             # Eloquentモデル
+├── Services/           # ビジネスロジック
+├── Repositories/       # データアクセス
+└── Events/            # イベント
+```
+
+### 追加ディレクトリ
+```
+app/
+├── Actions/           # 単一責任の処理
+├── Notifications/     # 通知クラス
+├── Policies/         # 認可ポリシー
+└── View/
+    └── Components/   # Bladeコンポーネント
+```
+
+## 命名規則
+
+### コントローラー
+- 名前は複数形、`Controller`サフィックス付き
+- リソースコントローラーは`index`, `create`, `store`, `show`, `edit`, `update`, `destroy`メソッドを実装
+- シングルアクションコントローラーは`__invoke`メソッドを使用
+
+例：
+```php
+class PostsController extends Controller
+{
+    public function index() { ... }
+    public function store(StorePostRequest $request) { ... }
+}
+```
+
+### モデル
+- 名前は単数形
+- リレーション名は意味が明確な名前を使用
+- スコープは`scope`プレフィックス付き
+
+例：
+```php
+class Post extends Model
+{
+    public function author()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+}
+```
+
+### フォームリクエスト
+- 名前は動作＋モデル名＋`Request`
+- バリデーションルールは`rules()`メソッドに定義
+- カスタムメッセージは`messages()`メソッドに定義
+
+例：
+```php
+class StorePostRequest extends FormRequest
+{
+    public function rules()
+    {
+        return [
+            'title' => 'required|max:255',
+            'content' => 'required',
+        ];
+    }
+}
+```
+
+### サービスクラス
+- 特定のビジネスロジックをカプセル化
+- 単一責任の原則に従う
+- コンストラクタインジェクションを使用
+
+例：
+```php
+class PostService
+{
+    public function __construct(
+        private PostRepository $repository
+    ) {}
+
+    public function createPost(array $data): Post
+    {
+        // ビジネスロジックの実装
+    }
+}
+```
+
+## ルーティング規則
+
+### 基本ルール
+- RESTfulリソースルートを優先使用
+- ルート名は`リソース名.アクション`形式
+- URLは複数形を使用
+
+例：
+```php
+Route::resource('posts', PostsController::class);
+Route::get('posts/{post}/comments', [CommentsController::class, 'index'])->name('posts.comments.index');
+```
+
+### ルートグループ化
+- ミドルウェアでグループ化
+- 名前空間でグループ化
+- プレフィックスでグループ化
+
+例：
+```php
+Route::middleware(['auth'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // 管理者ルート
+    });
+```
+
+## ビューの規則
+
+### Bladeテンプレート
+- コンポーネント化を推進
+- セクション名は明確な名前を使用
+- 共通レイアウトの活用
+
+例：
+```blade
+@extends('layouts.app')
+
+@section('content')
+    <x-post-card :post="$post"/>
+@endsection
+```
+
+### Bladeコンポーネント
+- 再利用可能なUIパーツをコンポーネント化
+- プロパティの型定義を明確に
+- スロットを活用
+
+例：
+```php
+class PostCard extends Component
+{
+    public function __construct(
+        public Post $post
+    ) {}
+
+    public function render()
+    {
+        return view('components.post-card');
+    }
+}
+```
+
+## 認証・認可
+
+### 認証
+- `Laravel Breeze`を使用
+- カスタム認証ガードの使用は最小限に
+- セッション管理は適切に設定
+
+### 認可
+- ポリシーを使用して権限管理
+- `Gate`ファサードの使用は最小限に
+- ミドルウェアでの権限チェック
+
+例：
+```php
+class PostPolicy
+{
+    public function update(User $user, Post $post)
+    {
+        return $user->id === $post->user_id;
+    }
+}
+```
+
+## エラー処理
+
+### 例外処理
+- カスタム例外クラスの作成
+- 適切なHTTPステータスコードの使用
+- ログレベルの適切な設定
+
+例：
+```php
+class PostNotFoundException extends Exception
+{
+    public function render($request)
+    {
+        return response()->json([
+            'message' => 'Post not found'
+        ], 404);
+    }
+}
+```
+
+## テスト
+
+### ユニットテスト
+- 各クラスの単一責任をテスト
+- モックを適切に使用
+- テストデータはファクトリーを使用
+
+### フィーチャーテスト
+- 主要な機能フローをテスト
+- データベーストランザクションを使用
+- 認証・認可のテストを含める
+
+例：
+```php
+class PostTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_user_can_create_post()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->post('/posts', [
+            'title' => 'Test Post',
+            'content' => 'Test Content'
+        ]);
+        $response->assertRedirect();
+        $this->assertDatabaseHas('posts', ['title' => 'Test Post']);
+    }
+}
+```
+
+## パフォーマンス最適化
+
+### クエリ最適化
+- Eager Loadingの適切な使用
+- クエリビルダーの効率的な使用
+- キャッシュの適切な使用
+
+### N+1問題の回避
+- `with()`メソッドの使用
+- `load()`メソッドの適切な使用
+- クエリログでの監視
+
+## セキュリティ
+
+### CSRF保護
+- すべてのフォームでCSRFトークンを使用
+- APIトークンの適切な管理
+- セッションセキュリティの確保
+
+### XSS対策
+- エスケープ処理の徹底
+- Content Security Policyの設定
+- 入力値のバリデーション
+
