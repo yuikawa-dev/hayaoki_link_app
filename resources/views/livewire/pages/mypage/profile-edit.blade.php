@@ -13,6 +13,7 @@ new class extends Component {
     public $bio;
     public $profile_image;
     public $current_profile_image;
+    public $remove_profile_image = false;
 
     public function mount()
     {
@@ -36,7 +37,12 @@ new class extends Component {
 
         $user = auth()->user();
 
-        if ($this->profile_image) {
+        if ($this->remove_profile_image) {
+            if ($user->profile_image) {
+                Storage::delete($user->profile_image);
+                $validated['profile_image'] = null;
+            }
+        } elseif ($this->profile_image) {
             if ($user->profile_image) {
                 Storage::delete($user->profile_image);
             }
@@ -91,6 +97,15 @@ new class extends Component {
                                 hover:file:bg-indigo-100
                             " />
                         </label>
+                        @if ($current_profile_image)
+                            <div class="flex items-center">
+                                <input type="checkbox" wire:model="remove_profile_image" id="remove_profile_image"
+                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                <label for="remove_profile_image" class="ml-2 text-sm text-gray-600">
+                                    プロフィール画像を削除
+                                </label>
+                            </div>
+                        @endif
                     </div>
                     @error('profile_image')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
