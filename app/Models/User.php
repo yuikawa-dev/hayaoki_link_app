@@ -60,6 +60,16 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function likedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'likes')->withTimestamps();
+    }
+
     /**
      * ユーザー名からイニシャルを取得
      * 

@@ -44,4 +44,14 @@ class Post extends Model
             ->withPivot('type')
             ->withTimestamps();
     }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function likedUsers()
+    {
+        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
+    }
 }
