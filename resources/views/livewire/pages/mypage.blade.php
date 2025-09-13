@@ -92,18 +92,52 @@ state([
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-gray-900">最近の投稿</h3>
-                        <div class="flex items-center space-x-3">
-                            <a href="{{ route('posts.index') }}"
-                                class="inline-flex items-center px-3 py-1.5 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 focus:bg-green-500 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                <i class="fas fa-users mr-1"></i>
-                                みんなの朝
-                            </a>
+                        <div class="flex items-center space-x-4">
+                            <!-- みんなの朝ボタン（キラキラアニメーション付き） -->
+                            <div class="relative" x-data="{ sparkle: false }">
+                                <a href="{{ route('posts.index') }}" @mouseenter="sparkle = true"
+                                    @mouseleave="sparkle = false"
+                                    class="inline-flex items-center px-6 py-3 bg-green-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-green-500 focus:bg-green-500 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl relative overflow-hidden">
+                                    <i class="fas fa-users mr-2 text-lg"></i>
+                                    みんなの朝
+
+                                    <!-- キラキラエフェクト -->
+                                    <div x-show="sparkle"
+                                        class="absolute inset-0 pointer-events-none rounded-lg overflow-hidden">
+                                        <div
+                                            class="absolute top-1 left-2 w-1 h-1 bg-white rounded-full animate-ping opacity-75">
+                                        </div>
+                                        <div class="absolute top-3 right-3 w-1.5 h-1.5 bg-yellow-300 rounded-full animate-pulse opacity-80"
+                                            style="animation-delay: 0.1s;"></div>
+                                        <div class="absolute bottom-2 left-1/3 w-1 h-1 bg-white rounded-full animate-bounce opacity-70"
+                                            style="animation-delay: 0.2s;"></div>
+                                        <div class="absolute top-1/2 right-1 w-0.5 h-0.5 bg-yellow-200 rounded-full animate-ping opacity-60"
+                                            style="animation-delay: 0.3s;"></div>
+                                        <div class="absolute bottom-1 right-1/4 w-1 h-1 bg-white rounded-full animate-pulse opacity-75"
+                                            style="animation-delay: 0.4s;"></div>
+                                        <div class="absolute top-2 left-1/2 w-0.5 h-0.5 bg-yellow-400 rounded-full animate-bounce opacity-80"
+                                            style="animation-delay: 0.15s;"></div>
+                                    </div>
+
+                                    <!-- オーバーレイグロー -->
+                                    <div x-show="sparkle" x-transition:enter="transition ease-out duration-300"
+                                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                        x-transition:leave="transition ease-in duration-200"
+                                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                        class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse rounded-lg">
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 新規投稿ボタン（大きくした） -->
                             <a href="{{ route('posts.create') }}"
-                                class="inline-flex items-center px-3 py-1.5 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                <i class="fas fa-plus mr-1"></i>
+                                class="inline-flex items-center px-6 py-3 bg-indigo-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                <i class="fas fa-plus mr-2 text-lg"></i>
                                 新規投稿
                             </a>
-                            <a href="{{ route('mypage.posts') }}" class="text-sm text-indigo-600 hover:text-indigo-500">
+
+                            <a href="{{ route('mypage.posts') }}"
+                                class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
                                 すべて見る
                             </a>
                         </div>
