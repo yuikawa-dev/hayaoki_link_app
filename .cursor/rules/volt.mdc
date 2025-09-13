@@ -1,0 +1,326 @@
+# Voltシンタックスルール
+
+## 目的
+LivewireのVoltシンタックスを使用した開発における標準的な実装方法とベストプラクティスを定義します。
+
+## コンポーネント設計
+
+### 基本構造
+```php
+<?php
+
+use function Livewire\Volt\{state, computed, mount};
+
+state([
+    'message' => '',
+    'posts' => [],
+]);
+
+// ライフサイクルフック
+mount(function () {
+    $this->posts = Post::latest()->get();
+});
+
+// 算出プロパティ
+computed(function () {
+    return Post::count();
+})->persist();
+?>
+
+<div>
+    <!-- テンプレート -->
+</div>
+```
+
+### 命名規則
+
+#### コンポーネントファイル
+- 名前は`PascalCase`
+- 機能を表す明確な名前を使用
+- 場所や用途に応じたプレフィックスを使用
+
+例：
+```
+resources/views/livewire/
+├── Timeline/
+│   ├── PostForm.blade.php
+│   └── PostList.blade.php
+├── Shop/
+│   ├── ShopCard.blade.php
+│   └── ShopList.blade.php
+└── Event/
+    ├── EventForm.blade.php
+    └── EventList.blade.php
+```
+
+#### メソッド命名
+- アクション: 動詞から始める（`createPost`, `updateProfile`）
+- イベントハンドラ: `handle`プレフィックス（`handleSubmit`, `handleClick`）
+- 算出プロパティ: 名詞または形容詞（`totalPosts`, `isAdmin`）
+
+## 状態管理
+
+### stateの定義
+```php
+state([
+    // プリミティブ値
+    'name' => '',
+    'isLoading' => false,
+
+    // 配列・オブジェクト
+    'posts' => [],
+    'user' => null,
+
+    // フォーム関連
+    'form' => [
+        'title' => '',
+        'content' => '',
+    ],
+]);
+```
+
+### computedプロパティ
+```php
+// 単純な算出プロパティ
+computed(function () {
+    return $this->posts->count();
+})->persist();
+
+// 引数付き算出プロパティ
+computed(function (int $id) {
+    return Post::find($id);
+});
+```
+
+### ライフサイクルフック
+```php
+// マウント時の初期化
+mount(function () {
+    $this->posts = Post::latest()->get();
+});
+
+// 更新時の処理
+updated(function ($name, $value) {
+    if ($name === 'search') {
+        $this->filterResults();
+    }
+});
+```
+
+## アクション定義
+
+### 基本アクション
+```php
+// 単純なアクション
+action(function () {
+    $this->posts = Post::latest()->get();
+});
+
+// パラメータ付きアクション
+action(function (Post $post) {
+    $post->delete();
+    $this->posts = Post::latest()->get();
+});
+```
+
+### フォーム処理
+```php
+// フォーム送信
+action(function () {
+    $validated = $this->validate([
+        'form.title' => 'required|min:3',
+        'form.content' => 'required',
+    ]);
+
+    Post::create($validated['form']);
+    $this->reset('form');
+});
+```
+
+## バリデーション
+
+### ルール定義
+```php
+// インラインバリデーション
+rules([
+    'form.title' => 'required|min:3|max:255',
+    'form.content' => 'required|min:10',
+]);
+
+// カスタムメッセージ
+messages([
+    'form.title.required' => 'タイトルは必須です',
+    'form.content.min' => '内容は最低10文字必要です',
+]);
+```
+
+### リアルタイムバリデーション
+```php
+state(['email' => ''])->url();
+
+rule('email', ['required', 'email']);
+
+// 入力時バリデーション
+with(fn() => $this->validate());
+```
+
+## イベント管理
+
+### イベントの発火
+```php
+// イベント発火
+dispatch('post-created', postId: $post->id);
+
+// パラメータ付きイベント
+dispatch('notification', [
+    'type' => 'success',
+    'message' => '投稿が完了しました',
+]);
+```
+
+### イベントリスナー
+```php
+// イベントリスニング
+on(['post-created' => function ($postId) {
+    $this->refreshPosts();
+}]);
+```
+
+## テンプレート構造
+
+### 基本構造
+```blade
+<div>
+    <!-- ローディング状態 -->
+    <div wire:loading>
+        <x-loading-spinner />
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        @if ($posts->isEmpty())
+            <x-empty-state />
+        @else
+            @foreach ($posts as $post)
+                <x-post-card :post="$post" />
+            @endforeach
+        @endif
+    </div>
+</div>
+```
+
+### フォーム構造
+```blade
+<form wire:submit="save">
+    <!-- 入力フィールド -->
+    <input type="text" wire:model="form.title">
+    @error('form.title') 
+        <span class="error">{{ $message }}</span>
+    @enderror
+
+    <!-- ボタン -->
+    <button type="submit" wire:loading.attr="disabled">
+        <span wire:loading.remove>保存</span>
+        <span wire:loading>保存中...</span>
+    </button>
+</form>
+```
+
+## パフォーマンス最適化
+
+### ポーリング
+```php
+// 自動更新
+use function Livewire\Volt\{state, computed, mount};
+
+state(['posts' => []])
+    ->url()
+    ->poll('5s');
+```
+
+### 遅延読み込み
+```php
+// 遅延バリデーション
+wire:model.blur="form.title"
+
+// 遅延更新
+wire:model.debounce.500ms="search"
+```
+
+### キャッシュ
+```php
+// 算出プロパティのキャッシュ
+computed(function () {
+    return Post::count();
+})->persist();
+```
+
+## エラーハンドリング
+
+### 例外処理
+```php
+try {
+    // 処理
+} catch (\Exception $e) {
+    $this->addError('general', $e->getMessage());
+    logger()->error('Post creation failed', [
+        'error' => $e->getMessage(),
+        'user' => auth()->id(),
+    ]);
+}
+```
+
+### エラー表示
+```blade
+@error('general')
+    <div class="alert alert-danger">
+        {{ $message }}
+    </div>
+@enderror
+```
+
+## セキュリティ
+
+### CSRF保護
+- すべてのフォームで自動的に有効
+- カスタムリクエストでは`@csrf`ディレクティブを使用
+
+### 認可
+```php
+// アクション内での権限チェック
+action(function (Post $post) {
+    if (! auth()->user()->can('update', $post)) {
+        abort(403);
+    }
+    // 処理
+});
+```
+
+## テスト
+
+### コンポーネントテスト
+```php
+test('can create post', function () {
+    Livewire::test(CreatePost::class)
+        ->set('form.title', 'Test Post')
+        ->set('form.content', 'Test Content')
+        ->call('save')
+        ->assertHas('posts', function ($posts) {
+            return $posts->contains('title', 'Test Post');
+        });
+});
+```
+
+### ブラウザテスト
+```php
+test('can interact with form', function () {
+    $this->browse(function ($browser) {
+        $browser->visit('/posts/create')
+            ->type('@title-input', 'Test Post')
+            ->type('@content-input', 'Test Content')
+            ->press('@submit-button')
+            ->assertSee('投稿が完了しました');
+    });
+});
+```
+

@@ -1,0 +1,124 @@
+# データベース設計ルール
+
+## 目的
+朝活支援アプリ「はやおきリンク」のデータベース設計における一貫性と保守性を確保するためのルールを定義します。
+
+## テーブル設計ルール
+
+### 命名規則
+- テーブル名は複数形、スネークケースで記述
+- 中間テーブルは関連する2つのテーブル名を単数形で結合（例：`user_post`）
+- プライマリーキーは`id`（自動採番）
+- 外部キーは`テーブル名の単数形_id`
+- タイムスタンプは`created_at`、`updated_at`を使用
+- 論理削除用カラムは`deleted_at`を使用
+
+### 必要なテーブル一覧
+
+1. `users`（ユーザー情報）
+   - id
+   - name（ユーザー名）
+   - email（メールアドレス）
+   - password（パスワード）
+   - profile_image（プロフィール画像）
+   - bio（自己紹介）
+   - created_at
+   - updated_at
+
+2. `posts`（朝の投稿）
+   - id
+   - user_id（投稿者）
+   - content（投稿内容）
+   - posted_at（投稿日時）
+   - created_at
+   - updated_at
+
+3. `reactions`（投稿へのリアクション）
+   - id
+   - user_id（リアクションしたユーザー）
+   - post_id（リアクション対象の投稿）
+   - type（リアクションタイプ：いいね、応援等）
+   - created_at
+   - updated_at
+
+4. `comments`（投稿へのコメント）
+   - id
+   - user_id（コメントしたユーザー）
+   - post_id（コメント対象の投稿）
+   - content（コメント内容）
+   - created_at
+   - updated_at
+
+5. `shops`（朝活店舗情報）
+   - id
+   - name（店舗名）
+   - description（店舗説明）
+   - address（住所）
+   - contact（連絡先）
+   - sns_links（SNSリンク、JSON形式）
+   - opening_time（開店時間）
+   - closing_time（閉店時間）
+   - created_at
+   - updated_at
+
+6. `shop_images`（店舗画像）
+   - id
+   - shop_id（店舗ID）
+   - image_path（画像パス）
+   - image_type（画像タイプ：外観、メニュー等）
+   - created_at
+   - updated_at
+
+7. `menus`（店舗メニュー）
+   - id
+   - shop_id（店舗ID）
+   - name（メニュー名）
+   - price（価格）
+   - description（説明）
+   - image_path（画像パス）
+   - created_at
+   - updated_at
+
+8. `events`（朝活イベント）
+   - id
+   - name（イベント名）
+   - description（イベント説明）
+   - start_time（開始時間）
+   - end_time（終了時間）
+   - location（開催場所）
+   - requirements（持ち物）
+   - fee（参加費用）
+   - contact（連絡先）
+   - capacity（定員）
+   - created_at
+   - updated_at
+
+9. `event_registrations`（イベント参加登録）
+   - id
+   - event_id（イベントID）
+   - user_id（参加ユーザーID）
+   - status（参加状態：申込、キャンセル等）
+   - created_at
+   - updated_at
+
+## インデックス設計ルール
+- 外部キーには必ずインデックスを作成
+- 検索・ソートで頻繁に使用されるカラムにはインデックスを作成
+- 複合インデックスは使用頻度の高い検索条件の組み合わせに作成
+
+## マイグレーションルール
+- マイグレーションファイル名は`YYYY_MM_DD_HHMMSS_create_テーブル名_table.php`の形式
+- ロールバック時の動作も必ず実装
+- テーブル作成時は`$table->timestamps()`を必ず含める
+- 外部キー制約は必ず定義する
+
+## シーディングルール
+- 開発環境用の初期データは必ず用意
+- テストデータは現実的なデータを使用
+- Factory パターンを活用し、テストデータの生成を効率化
+
+## バックアップルール
+- 本番環境は毎日バックアップを取得
+- バックアップは最低7世代保持
+- 定期的にリストア試験を実施
+

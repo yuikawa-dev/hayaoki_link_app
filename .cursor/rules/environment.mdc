@@ -1,0 +1,165 @@
+# 開発環境ルール
+
+## 目的
+「はやおきリンク」の開発環境を統一し、効率的な開発を実現するためのルールを定義します。
+
+## 必要なソフトウェアとバージョン
+
+### 必須ソフトウェア
+- PHP 8.2以上
+- Composer 2.5以上
+- Node.js 18.x以上
+- npm 9.x以上
+- MySQL 8.0以上
+- Git 2.34以上
+
+### 推奨開発ツール
+- VSCode（推奨エディタ）
+- Docker Desktop（開発環境の仮想化）
+- TablePlus（データベース管理）
+- Postman（API開発・テスト）
+
+## 開発環境セットアップ手順
+
+1. リポジトリのクローン
+```bash
+git clone [repository-url]
+cd hayaoki_link_app
+```
+
+2. 依存パッケージのインストール
+```bash
+composer install
+npm install
+```
+
+3. 環境設定
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+4. データベースのセットアップ
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+5. 開発サーバーの起動
+```bash
+php artisan serve
+npm run dev
+```
+
+## 環境変数設定
+
+### 必須環境変数
+```env
+APP_NAME=Hayaoki Link
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=hayaoki_link
+DB_USERNAME=root
+DB_PASSWORD=
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+## Git設定
+
+### .gitignore ルール
+- `.env`ファイル
+- `node_modules/`ディレクトリ
+- `vendor/`ディレクトリ
+- `public/storage`
+- `storage/*.key`
+- `.phpunit.result.cache`
+- `docker-compose.override.yml`
+- IDE設定ファイル（`.idea/`, `.vscode/`等）
+
+### ブランチ命名規則
+- 機能開発: `feature/機能名`
+- バグ修正: `fix/バグ内容`
+- リファクタリング: `refactor/内容`
+- ホットフィックス: `hotfix/内容`
+
+## デバッグツール設定
+
+### Laravel Debugbar
+- ローカル環境でのみ有効化
+- パフォーマンス計測時は一時的に無効化
+
+### Xdebug設定
+```ini
+xdebug.mode=debug
+xdebug.start_with_request=yes
+xdebug.client_host=host.docker.internal
+xdebug.client_port=9003
+```
+
+## Docker環境
+
+### コンテナ構成
+- PHP-FPM
+- Nginx
+- MySQL
+- Redis
+- Mailpit（メール開発用）
+
+### Docker Compose コマンド
+```bash
+# 開発環境起動
+docker-compose up -d
+
+# コンテナ停止
+docker-compose down
+
+# コンテナ再構築
+docker-compose up -d --build
+```
+
+## CI/CD環境
+
+### GitHub Actions設定
+- プッシュ時の自動テスト実行
+- プルリクエスト時のコード品質チェック
+- マージ時の自動デプロイ
+
+### テスト環境
+- PHPUnit
+- Laravel Dusk（ブラウザテスト）
+- Jest（フロントエンドテスト）
+
+## セキュリティ設定
+
+### 開発環境でのセキュリティ設定
+- HTTPS証明書の設定
+- CSRFトークンの有効化
+- セッション設定の適切な管理
+- クロスオリジンリソース共有（CORS）の設定
+
+## パフォーマンス最適化
+
+### キャッシュ設定
+- Redisを使用したキャッシュ
+- セッションストレージの設定
+- アセットのキャッシュ
+
+### 開発時の注意点
+- N+1問題の回避
+- クエリログの監視
+- メモリ使用量の監視
+
