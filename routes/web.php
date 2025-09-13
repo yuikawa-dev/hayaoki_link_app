@@ -8,6 +8,8 @@ Route::get('/', function () {
 })->name('home');
 
 Volt::route('posts', 'pages.posts.index')->name('posts.index');
+Volt::route('shops', 'pages.shops.index')->name('shops.index');
+Volt::route('shops/create', 'pages.shops.create')->name('shops.create')->middleware('auth');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
