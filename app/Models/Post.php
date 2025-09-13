@@ -13,12 +13,14 @@ class Post extends Model
     // 編集可能な項目
     protected $fillable = [
         'user_id',
+        'title',
         'content',
-        'posted_at',
+        'url',
     ];
 
     protected $casts = [
-        'posted_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // リレーションシップ

@@ -80,7 +80,7 @@ state([
                                     <p class="text-gray-600">{{ $post->content }}</p>
                                     <div class="flex items-center justify-between mt-2">
                                         <span
-                                            class="text-sm text-gray-500">{{ $post->posted_at->format('Y/m/d H:i') }}</span>
+                                            class="text-sm text-gray-500">{{ $post->created_at->format('Y/m/d H:i') }}</span>
                                         <div class="flex items-center space-x-2">
                                             <span class="text-sm text-gray-500">
                                                 <i class="fas fa-heart"></i> {{ $post->reactions_count ?? 0 }}
