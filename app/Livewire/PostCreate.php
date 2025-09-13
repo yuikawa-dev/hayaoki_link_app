@@ -10,6 +10,7 @@ class PostCreate extends Component
 {
     public $content = '';
     public $message = null;
+    public $showSuccessAlert = false;
 
     protected $rules = [
         'content' => 'required|min:1|max:1000',
@@ -46,14 +47,21 @@ class PostCreate extends Component
                 'content' => $this->content,
             ]);
 
-            // 成功メッセージをセッションに保存
-            session()->flash('success', '投稿が完了しました！');
+            // 成功アラートを表示
+            $this->showSuccessAlert = true;
+            $this->message = '投稿が完了しました！';
+            $this->content = '';
 
-            // マイページにリダイレクト
-            return redirect()->route('mypage.posts');
+            // イベントを発火してJavaScript側でタイマーを開始
+            $this->dispatch('show-success-alert');
         } catch (\Exception $e) {
             $this->message = 'エラー: ' . $e->getMessage();
         }
+    }
+
+    public function hideAlert()
+    {
+        $this->showSuccessAlert = false;
     }
 
     public function render()
