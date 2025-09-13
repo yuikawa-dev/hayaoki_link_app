@@ -13,9 +13,7 @@ class Post extends Model
     // 編集可能な項目
     protected $fillable = [
         'user_id',
-        'title',
         'content',
-        'url',
     ];
 
     protected $casts = [
