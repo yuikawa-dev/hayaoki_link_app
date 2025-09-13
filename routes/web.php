@@ -15,7 +15,7 @@ Route::view('dashboard', 'dashboard')
 
 Route::middleware(['auth'])->group(function () {
     // 投稿関連のルート
-    Volt::route('posts/create', 'pages.posts.create')->name('posts.create');
+    Route::get('posts/create', App\Livewire\PostCreate::class)->name('posts.create');
     Volt::route('posts/{post}', 'pages.posts.show')->name('posts.show');
     // マイページ関連のルート
     Volt::route('mypage', 'pages.mypage')->name('mypage');
