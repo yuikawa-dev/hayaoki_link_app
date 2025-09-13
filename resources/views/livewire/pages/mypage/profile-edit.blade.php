@@ -4,42 +4,58 @@ use function Livewire\Volt\{state, rules, computed};
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 
-state([
-    'name' => fn() => auth()->user()->name,
-    'bio' => fn() => auth()->user()->bio,
-    'profile_image' => null,
-    'current_profile_image' => fn() => auth()->user()->profile_image,
-]);
+use Livewire\Volt\Component;
 
-rules([
-    'name' => ['required', 'string', 'max:255'],
-    'bio' => ['nullable', 'string', 'max:1000'],
-    'profile_image' => ['nullable', 'image', 'max:1024'],
-]);
+new class extends Component {
+    use WithFileUploads;
 
-$updateProfile = function () {
-    $validated = $this->validate();
+    public $name;
+    public $bio;
+    public $profile_image;
+    public $current_profile_image;
 
-    $user = auth()->user();
+    public function mount()
+    {
+        $this->name = auth()->user()->name;
+        $this->bio = auth()->user()->bio;
+        $this->current_profile_image = auth()->user()->profile_image;
+    }
 
-    if ($this->profile_image) {
-        if ($user->profile_image) {
-            Storage::delete($user->profile_image);
+    public function rules()
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:1000'],
+            'profile_image' => ['nullable', 'image', 'max:5120'],
+        ];
+    }
+
+    public function updateProfile()
+    {
+        $validated = $this->validate();
+
+        $user = auth()->user();
+
+        if ($this->profile_image) {
+            if ($user->profile_image) {
+                Storage::delete($user->profile_image);
+            }
+            $validated['profile_image'] = $this->profile_image->store('profile-images', 'public');
         }
-        $validated['profile_image'] = $this->profile_image->store('profile-images', 'public');
+
+        $user->update($validated);
+
+        $this->dispatch('profile-updated');
     }
 
-    $user->update($validated);
+    public function getProfileImageUrl()
+    {
+        if ($this->profile_image) {
+            return $this->profile_image->temporaryUrl();
+        }
 
-    $this->dispatch('profile-updated');
-};
-
-$getProfileImageUrl = function () {
-    if ($this->profile_image) {
-        return $this->profile_image->temporaryUrl();
+        return $this->current_profile_image ? Storage::url($this->current_profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
-
-    return $this->current_profile_image ? Storage::url($this->current_profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
 };
 
 ?>
@@ -47,7 +63,7 @@ $getProfileImageUrl = function () {
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <form wire:submit="updateProfile" class="p-6">
+            <form wire:submit.prevent="updateProfile" class="p-6">
                 <h2 class="text-lg font-medium text-gray-900 mb-6">
                     プロフィール編集
                 </h2>
@@ -85,7 +101,7 @@ $getProfileImageUrl = function () {
                         名前
                     </label>
                     <input type="text" wire:model="name" id="name"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-black">
                     @error('name')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -97,7 +113,7 @@ $getProfileImageUrl = function () {
                         自己紹介
                     </label>
                     <textarea wire:model="bio" id="bio" rows="4"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-black"></textarea>
                     @error('bio')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror

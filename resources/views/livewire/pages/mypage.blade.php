@@ -20,14 +20,8 @@ state([
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
             <div class="p-6">
                 <div class="flex items-center space-x-4">
-                    @if (!empty($user->profile_image))
-                        <img src="{{ Storage::url($user->profile_image) }}" alt="{{ $user->name }}"
-                            class="h-24 w-24 rounded-full object-cover">
-                    @else
-                        <div class="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
-                            <i class="fas fa-smile text-4xl text-gray-400"></i>
-                        </div>
-                    @endif
+                    <img src="{{ $user->profile_image ? Storage::url($user->profile_image) : asset('storage/profile-images/default-profile.svg') }}"
+                        alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
                         <p class="text-gray-600 mt-1">{{ $user->bio }}</p>
