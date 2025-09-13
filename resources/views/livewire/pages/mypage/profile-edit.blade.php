@@ -45,7 +45,9 @@ new class extends Component {
 
         $user->update($validated);
 
-        $this->dispatch('profile-updated');
+        session()->flash('success', '更新しました。');
+
+        return $this->redirect(route('mypage'), navigate: true);
     }
 
     public function getProfileImageUrl()
