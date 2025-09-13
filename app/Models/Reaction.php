@@ -9,6 +9,7 @@ class Reaction extends Model
 {
     use HasFactory;
 
+    // 編集可能な項目
     protected $fillable = [
         'user_id',
         'post_id',

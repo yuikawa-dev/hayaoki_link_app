@@ -9,6 +9,7 @@ class ShopImage extends Model
 {
     use HasFactory;
 
+    // 編集可能な項目
     protected $fillable = [
         'shop_id',
         'image_path',

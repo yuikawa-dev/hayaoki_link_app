@@ -9,6 +9,7 @@ class EventRegistration extends Model
 {
     use HasFactory;
 
+    // 編集可能な項目
     protected $fillable = [
         'event_id',
         'user_id',

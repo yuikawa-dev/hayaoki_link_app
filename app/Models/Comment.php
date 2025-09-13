@@ -10,6 +10,7 @@ class Comment extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // 編集可能な領域
     protected $fillable = [
         'user_id',
         'post_id',

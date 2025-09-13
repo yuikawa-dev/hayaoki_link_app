@@ -10,6 +10,7 @@ class Menu extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // 編集可能な項目
     protected $fillable = [
         'shop_id',
         'name',

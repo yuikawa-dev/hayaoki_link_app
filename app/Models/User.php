@@ -13,6 +13,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable, SoftDeletes;
     // use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
+    // 編集可能な項目
     protected $fillable = [
         'name',
         'email',
@@ -57,5 +58,22 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'event_registrations')
             ->withPivot('status')
             ->withTimestamps();
+    }
+
+    /**
+     * ユーザー名からイニシャルを取得
+     * 
+     * @return string
+     */
+    public function initials(): string
+    {
+        $words = explode(' ', $this->name);
+        $initials = '';
+
+        foreach ($words as $word) {
+            $initials .= mb_substr($word, 0, 1);
+        }
+
+        return mb_strtoupper($initials);
     }
 }

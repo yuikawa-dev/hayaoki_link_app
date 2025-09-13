@@ -10,6 +10,7 @@ class Post extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // 編集可能な項目
     protected $fillable = [
         'user_id',
         'content',
