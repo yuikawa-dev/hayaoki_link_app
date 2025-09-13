@@ -119,14 +119,11 @@ $hideAlert = function () {
                 </div> --}}
 
                 <!-- エラーメッセージ表示（成功メッセージと成功アラートは除外） -->
-                @if (isset($this->message) &&
-                        !empty($this->message) &&
-                        !$showSuccessAlert &&
-                        !str_contains($this->message, '投稿が完了'))
+                {{-- @if (isset($this->message) && !empty($this->message) && !$showSuccessAlert && !str_contains($this->message, '投稿が完了'))
                     <div class="mb-4 p-3 bg-red-100 border border-red-400 rounded text-black">
                         <p class="text-red-800">{{ $this->message }}</p>
                     </div>
-                @endif
+                @endif --}}
 
                 <form wire:submit="save" class="space-y-4">
                     <div class="mb-6">
