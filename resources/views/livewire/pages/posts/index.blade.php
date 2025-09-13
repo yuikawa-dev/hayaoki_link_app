@@ -25,7 +25,7 @@ $posts = computed(function () {
         ->paginate($this->perPage);
 });
 
-public function deletePost(Post $post) {
+$deletePost = function (Post $post) {
     if (Auth::id() !== $post->user_id) {
         return;
     }
@@ -38,7 +38,17 @@ public function deletePost(Post $post) {
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-12">
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 text-gray-900 dark:text-gray-100">
-                <h1 class="text-2xl font-semibold mb-6">最近の投稿</h1>
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-semibold">みんなの朝</h1>
+                    <a href="{{ route('mypage') }}"
+                        class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition duration-150 ease-in-out">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        マイページに戻る
+                    </a>
+                </div>
 
                 @if ($this->posts->isEmpty())
                     <p class="text-gray-500 dark:text-gray-400 text-center py-8">
