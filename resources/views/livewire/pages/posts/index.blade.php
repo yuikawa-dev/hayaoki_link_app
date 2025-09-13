@@ -25,7 +25,7 @@ $posts = computed(function () {
         ->paginate($this->perPage);
 });
 
-$deletePost = function (Post $post) {
+public function deletePost(Post $post) {
     if (Auth::id() !== $post->user_id) {
         return;
     }

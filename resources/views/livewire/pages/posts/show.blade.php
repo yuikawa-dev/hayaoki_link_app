@@ -1,17 +1,24 @@
 <?php
 
-use function Livewire\Volt\{state, rules};
+use function Livewire\Volt\{state, mount};
 use App\Models\Post;
 use App\Models\Comment;
 use App\Models\Like;
 
-state(['post' => fn() => Post::findOrFail(request()->route('post'))]);
-state(['newComment' => '']);
+state([
+    'post' => null,
+    'newComment' => '',
+]);
 
-rules(['newComment' => 'required|min:1|max:1000']);
+mount(function () {
+    $this->post = Post::with(['comments.user', 'likes'])->findOrFail(request()->route('post'));
+});
 
-$addComment = function () {
-    $this->validate();
+public function addComment()
+{
+    $this->validate([
+        'newComment' => 'required|min:1|max:1000',
+    ]);
 
     Comment::create([
         'user_id' => auth()->id(),
@@ -20,10 +27,11 @@ $addComment = function () {
     ]);
 
     $this->newComment = '';
-    $this->post = Post::findOrFail($this->post->id);
-};
+    $this->post = Post::with(['comments.user', 'likes'])->findOrFail($this->post->id);
+}
 
-$toggleLike = function () {
+public function toggleLike()
+{
     $existingLike = Like::where('user_id', auth()->id())
         ->where('post_id', $this->post->id)
         ->first();
@@ -37,8 +45,8 @@ $toggleLike = function () {
         ]);
     }
 
-    $this->post = Post::findOrFail($this->post->id);
-};
+    $this->post = Post::with(['comments.user', 'likes'])->findOrFail($this->post->id);
+}
 
 ?>
 
@@ -109,9 +117,9 @@ $toggleLike = function () {
 
                         <!-- コメントフォーム -->
                         <div class="mb-6">
-                            <form wire:submit="addComment">
+                            <form wire:submit.prevent="addComment">
                                 <div class="mb-4">
-                                    <textarea wire:model="newComment"
+                                    <textarea wire:model.live="newComment"
                                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
                                         rows="3" placeholder="コメントを入力してください"></textarea>
                                     @error('newComment')
