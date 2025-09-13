@@ -88,6 +88,16 @@ class User extends Authenticatable
     }
 
     /**
+     * 管理者かどうかを判定
+     * 
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->email === 'admin@example.com';
+    }
+
+    /**
      * プロフィール画像のURLを取得
      */
     public function getProfileImageUrlAttribute(): string

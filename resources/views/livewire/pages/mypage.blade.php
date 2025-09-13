@@ -45,6 +45,38 @@ state([
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- プロフィールセクション -->
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
+            @if ($user->isAdmin())
+                <!-- 管理者専用：お店登録ボタン -->
+                <div
+                    class="lg:col-span-5 bg-gradient-to-r from-rose-100 to-pink-100 border-2 border-rose-200 overflow-hidden shadow-sm sm:rounded-lg mb-4">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-10 h-10 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">管理者メニュー</h3>
+                                    <p class="text-sm text-gray-600">朝活お店の登録・管理ができます</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('shops.create') }}"
+                                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                お店を登録する
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
             <!-- プロフィール情報 -->
             <div class="lg:col-span-3 bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
@@ -66,11 +98,11 @@ state([
             <!-- お店を探すボタン -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 h-full flex items-center justify-center">
-                    <button
+                    <a href="{{ route('shops.index') }}"
                         class="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-lg hover:shadow-2xl hover:shadow-orange-400/50 hover:brightness-110">
                         <i class="fas fa-coffee text-4xl mb-2 hover:animate-pulse"></i>
                         <span class="text-lg font-semibold">お店を探す</span>
-                    </button>
+                    </a>
                 </div>
             </div>
 

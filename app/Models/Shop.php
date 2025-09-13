@@ -51,4 +51,28 @@ class Shop extends Model
         return $this->images()->where('image_type', 'exterior')->first()
             ?? $this->images()->first();
     }
+
+    // 朝から営業しているお店を取得するスコープ
+    public function scopeMorningOpen($query, $morningTime = '08:00')
+    {
+        return $query->where('opening_time', '<=', $morningTime);
+    }
+
+    // 名前で検索するスコープ
+    public function scopeSearchByName($query, $name)
+    {
+        if ($name) {
+            return $query->where('name', 'like', '%' . $name . '%');
+        }
+        return $query;
+    }
+
+    // 住所で検索するスコープ
+    public function scopeSearchByAddress($query, $address)
+    {
+        if ($address) {
+            return $query->where('address', 'like', '%' . $address . '%');
+        }
+        return $query;
+    }
 }
