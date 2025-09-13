@@ -14,11 +14,11 @@ class Post extends Model
     protected $fillable = [
         'user_id',
         'content',
-        'posted_at',
     ];
 
     protected $casts = [
-        'posted_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // リレーションシップ
@@ -43,5 +43,15 @@ class Post extends Model
         return $this->belongsToMany(User::class, 'reactions')
             ->withPivot('type')
             ->withTimestamps();
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function likedUsers()
+    {
+        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
     }
 }
