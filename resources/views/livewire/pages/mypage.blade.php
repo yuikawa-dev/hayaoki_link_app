@@ -44,19 +44,44 @@ state([
     @endif
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- プロフィールセクション -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-            <div class="p-6">
-                <div class="flex items-center space-x-4">
-                    <img src="{{ $user->profile_image ? Storage::url($user->profile_image) : asset('storage/profile-images/default-profile.svg') }}"
-                        alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
-                        <p class="text-gray-600 mt-1">{{ $user->bio }}</p>
-                        <a href="{{ route('mypage.profile.edit') }}"
-                            class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 mt-4">
-                            プロフィールを編集
-                        </a>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
+            <!-- プロフィール情報 -->
+            <div class="lg:col-span-3 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <div class="flex items-center space-x-4">
+                        <img src="{{ $user->profile_image ? Storage::url($user->profile_image) : asset('storage/profile-images/default-profile.svg') }}"
+                            alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
+                            <p class="text-gray-600 mt-1">{{ $user->bio }}</p>
+                            <a href="{{ route('mypage.profile.edit') }}"
+                                class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 mt-4">
+                                プロフィールを編集
+                            </a>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- お店を探すボタン -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 h-full flex items-center justify-center">
+                    <button
+                        class="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-lg hover:shadow-2xl hover:shadow-orange-400/50 hover:brightness-110">
+                        <i class="fas fa-coffee text-4xl mb-2 hover:animate-pulse"></i>
+                        <span class="text-lg font-semibold">お店を探す</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- イベントを探すボタン -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 h-full flex items-center justify-center">
+                    <button
+                        class="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-lg hover:shadow-xl hover:bg-gradient-to-br hover:from-indigo-500 hover:to-pink-600">
+                        <i class="fas fa-calendar-alt text-4xl mb-2"></i>
+                        <span class="text-lg font-semibold">イベントを探す</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -67,13 +92,52 @@ state([
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-gray-900">最近の投稿</h3>
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-4">
+                            <!-- みんなの朝ボタン（キラキラアニメーション付き） -->
+                            <div class="relative" x-data="{ sparkle: false }">
+                                <a href="{{ route('posts.index') }}" @mouseenter="sparkle = true"
+                                    @mouseleave="sparkle = false"
+                                    class="inline-flex items-center px-6 py-3 bg-green-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-green-500 focus:bg-green-500 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl relative overflow-hidden">
+                                    <i class="fas fa-users mr-2 text-lg"></i>
+                                    みんなの朝
+
+                                    <!-- キラキラエフェクト -->
+                                    <div x-show="sparkle"
+                                        class="absolute inset-0 pointer-events-none rounded-lg overflow-hidden">
+                                        <div
+                                            class="absolute top-1 left-2 w-1 h-1 bg-white rounded-full animate-ping opacity-75">
+                                        </div>
+                                        <div class="absolute top-3 right-3 w-1.5 h-1.5 bg-yellow-300 rounded-full animate-pulse opacity-80"
+                                            style="animation-delay: 0.1s;"></div>
+                                        <div class="absolute bottom-2 left-1/3 w-1 h-1 bg-white rounded-full animate-bounce opacity-70"
+                                            style="animation-delay: 0.2s;"></div>
+                                        <div class="absolute top-1/2 right-1 w-0.5 h-0.5 bg-yellow-200 rounded-full animate-ping opacity-60"
+                                            style="animation-delay: 0.3s;"></div>
+                                        <div class="absolute bottom-1 right-1/4 w-1 h-1 bg-white rounded-full animate-pulse opacity-75"
+                                            style="animation-delay: 0.4s;"></div>
+                                        <div class="absolute top-2 left-1/2 w-0.5 h-0.5 bg-yellow-400 rounded-full animate-bounce opacity-80"
+                                            style="animation-delay: 0.15s;"></div>
+                                    </div>
+
+                                    <!-- オーバーレイグロー -->
+                                    <div x-show="sparkle" x-transition:enter="transition ease-out duration-300"
+                                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                        x-transition:leave="transition ease-in duration-200"
+                                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                        class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse rounded-lg">
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 新規投稿ボタン（大きくした） -->
                             <a href="{{ route('posts.create') }}"
-                                class="inline-flex items-center px-3 py-1.5 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                <i class="fas fa-plus mr-1"></i>
+                                class="inline-flex items-center px-6 py-3 bg-indigo-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                <i class="fas fa-plus mr-2 text-lg"></i>
                                 新規投稿
                             </a>
-                            <a href="{{ route('mypage.posts') }}" class="text-sm text-indigo-600 hover:text-indigo-500">
+
+                            <a href="{{ route('mypage.posts') }}"
+                                class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
                                 すべて見る
                             </a>
                         </div>
