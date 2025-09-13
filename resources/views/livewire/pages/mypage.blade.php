@@ -44,19 +44,44 @@ state([
     @endif
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- プロフィールセクション -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-            <div class="p-6">
-                <div class="flex items-center space-x-4">
-                    <img src="{{ $user->profile_image ? Storage::url($user->profile_image) : asset('storage/profile-images/default-profile.svg') }}"
-                        alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
-                        <p class="text-gray-600 mt-1">{{ $user->bio }}</p>
-                        <a href="{{ route('mypage.profile.edit') }}"
-                            class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 mt-4">
-                            プロフィールを編集
-                        </a>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
+            <!-- プロフィール情報 -->
+            <div class="lg:col-span-3 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <div class="flex items-center space-x-4">
+                        <img src="{{ $user->profile_image ? Storage::url($user->profile_image) : asset('storage/profile-images/default-profile.svg') }}"
+                            alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
+                            <p class="text-gray-600 mt-1">{{ $user->bio }}</p>
+                            <a href="{{ route('mypage.profile.edit') }}"
+                                class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 mt-4">
+                                プロフィールを編集
+                            </a>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- お店を探すボタン -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 h-full flex items-center justify-center">
+                    <button
+                        class="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-lg hover:shadow-2xl hover:shadow-orange-400/50 hover:brightness-110">
+                        <i class="fas fa-coffee text-4xl mb-2 hover:animate-pulse"></i>
+                        <span class="text-lg font-semibold">お店を探す</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- イベントを探すボタン -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 h-full flex items-center justify-center">
+                    <button
+                        class="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-lg hover:shadow-xl hover:bg-gradient-to-br hover:from-indigo-500 hover:to-pink-600">
+                        <i class="fas fa-calendar-alt text-4xl mb-2"></i>
+                        <span class="text-lg font-semibold">イベントを探す</span>
+                    </button>
                 </div>
             </div>
         </div>
