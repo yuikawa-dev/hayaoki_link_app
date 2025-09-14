@@ -62,17 +62,27 @@ state([
                                 </div>
                                 <div>
                                     <h3 class="text-lg font-semibold text-gray-900">管理者メニュー</h3>
-                                    <p class="text-sm text-gray-600">朝活お店の登録・管理ができます</p>
+                                    <p class="text-sm text-gray-600">朝活お店・イベントの登録・管理ができます</p>
                                 </div>
                             </div>
-                            <a href="{{ route('shops.create') }}"
-                                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                                お店を登録する
-                            </a>
+                            <div class="flex items-center space-x-3">
+                                <a href="{{ route('shops.create') }}"
+                                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    お店を登録する
+                                </a>
+                                <a href="{{ route('events.create') }}"
+                                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3a1 1 0 012 0v4m0 0V3a1 1 0 012 0v4m0 0h4l-4 4-4-4h8z"></path>
+                                    </svg>
+                                    イベントを登録する
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

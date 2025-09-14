@@ -13,6 +13,7 @@ Volt::route('shops/create', 'pages.shops.create')->name('shops.create')->middlew
 Volt::route('shops/{shop}', 'pages.shops.show')->name('shops.show');
 Volt::route('shops/{shop}/edit', 'pages.shops.edit')->name('shops.edit')->middleware('auth');
 Volt::route('events', 'pages.events.index')->name('events.index');
+Volt::route('events/create', 'pages.events.create')->name('events.create')->middleware('auth');
 Volt::route('events/{event}', 'pages.events.show')->name('events.show');
 
 Route::view('dashboard', 'dashboard')
