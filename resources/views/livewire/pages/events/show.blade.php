@@ -296,14 +296,14 @@ $deleteEvent = function () {
                 <!-- 参加申込ボタン -->
                 @if (!$event->isFinished() && $event->hasAvailableSlots())
                     <div class="text-center">
-                        <button
+                        <a href="{{ route('events.apply', $event->id) }}"
                             class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-lg font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
                             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
                             このイベントに参加申込する
-                        </button>
+                        </a>
                     </div>
                 @elseif ($event->isFinished())
                     <div class="text-center">
