@@ -80,19 +80,41 @@ $cancelRegistration = function ($eventId) {
                                             @endif
                                             @if ($event->requirements)
                                                 <p class="text-sm text-gray-500">
-                                                    <i class="fas fa-list"></i>
-                                                    持ち物：{{ $event->requirements }}
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    参加条件・注意事項：{{ $event->requirements }}
                                                 </p>
                                             @endif
                                         </div>
                                     </div>
-                                    @if ($event->pivot->status !== 'cancelled' && $event->start_time->isFuture())
-                                        <button wire:click="cancelRegistration({{ $event->id }})"
-                                            wire:confirm="このイベントの参加をキャンセルしてもよろしいですか？"
-                                            class="text-red-600 hover:text-red-800">
-                                            参加をキャンセル
-                                        </button>
-                                    @endif
+                                    <div class="flex items-center space-x-3">
+                                        <!-- 詳細を見るボタン -->
+                                        <a href="{{ route('events.show', $event->id) }}"
+                                            class="inline-flex items-center px-3 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                </path>
+                                            </svg>
+                                            詳細を見る
+                                        </a>
+
+                                        @if ($event->pivot->status !== 'cancelled' && $event->start_time->isFuture())
+                                            <!-- 参加をキャンセルボタン -->
+                                            <button wire:click="cancelRegistration({{ $event->id }})"
+                                                wire:confirm="このイベントの参加をキャンセルしてもよろしいですか？"
+                                                class="inline-flex items-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                                キャンセル
+                                            </button>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="mt-4">
                                     <span

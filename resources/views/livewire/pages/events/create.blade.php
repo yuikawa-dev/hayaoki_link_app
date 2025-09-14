@@ -352,20 +352,20 @@ $createEvent = function () {
                         @enderror
                     </div>
 
-                    <!-- 持ち物・要件 -->
+                    <!-- 参加条件・注意事項 -->
                     <div class="md:col-span-2">
                         <label for="requirements"
                             class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
+                            <svg class="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z">
                                 </path>
                             </svg>
-                            持ち物・要件
+                            参加条件・注意事項
                         </label>
-                        <textarea id="requirements" wire:model="requirements" rows="3" placeholder="持参物や参加要件があれば入力してください（任意）"
-                            class="w-full px-4 py-3 border-2 border-blue-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all duration-200 hover:border-blue-300 text-gray-900 resize-none"></textarea>
+                        <textarea id="requirements" wire:model="requirements" rows="3" placeholder="参加条件や注意事項があれば入力してください（任意）"
+                            class="w-full px-4 py-3 border-2 border-orange-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all duration-200 hover:border-orange-300 text-gray-900 resize-none"></textarea>
                         @error('requirements')
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                         @enderror
