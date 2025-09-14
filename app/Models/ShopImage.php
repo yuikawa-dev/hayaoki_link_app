@@ -35,4 +35,17 @@ class ShopImage extends Model
     {
         return $this->belongsTo(Shop::class);
     }
+
+    // 画像URLを取得するアクセサ
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path) {
+            // ファイルが実際に存在するかチェック
+            $fullPath = storage_path('app/public/' . $this->image_path);
+            if (file_exists($fullPath)) {
+                return asset('storage/' . $this->image_path);
+            }
+        }
+        return null;
+    }
 }

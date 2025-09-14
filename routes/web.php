@@ -10,6 +10,8 @@ Route::get('/', function () {
 Volt::route('posts', 'pages.posts.index')->name('posts.index');
 Volt::route('shops', 'pages.shops.index')->name('shops.index');
 Volt::route('shops/create', 'pages.shops.create')->name('shops.create')->middleware('auth');
+Volt::route('shops/{shop}', 'pages.shops.show')->name('shops.show');
+Volt::route('shops/{shop}/edit', 'pages.shops.edit')->name('shops.edit')->middleware('auth');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
