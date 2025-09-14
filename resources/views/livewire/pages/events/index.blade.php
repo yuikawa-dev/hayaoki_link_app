@@ -329,7 +329,7 @@ $hasApplied = function ($eventId) {
                                     詳細を見る
                                 </a>
                             @endif
-                            @if ($event->contact)
+                            {{-- @if ($event->contact)
                                 <a href="mailto:{{ $event->contact }}"
                                     class="px-4 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,7 +338,7 @@ $hasApplied = function ($eventId) {
                                         </path>
                                     </svg>
                                 </a>
-                            @endif
+                            @endif --}}
                         </div>
                     </div>
                 </div>

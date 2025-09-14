@@ -2,7 +2,7 @@
 
 use function Livewire\Volt\{state, computed};
 use App\Models\Post;
-use Livewire\WithPagination;
+
 
 state(['currentPage' => 1]);
 state(['perPage' => 10]);
