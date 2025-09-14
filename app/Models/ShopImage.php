@@ -40,7 +40,11 @@ class ShopImage extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image_path) {
-            return asset('storage/' . $this->image_path);
+            // ファイルが実際に存在するかチェック
+            $fullPath = storage_path('app/public/' . $this->image_path);
+            if (file_exists($fullPath)) {
+                return asset('storage/' . $this->image_path);
+            }
         }
         return null;
     }

@@ -10,14 +10,30 @@ use Livewire\WithFileUploads;
 uses([WithFileUploads::class]);
 
 // 管理者チェック
-mount(function () {
+mount(function ($shop) {
     if (!Auth::user()->isAdmin()) {
         abort(403, 'このページにアクセスする権限がありません。');
     }
+
+    // お店の詳細を取得
+    $shopModel = Shop::with('images')->findOrFail($shop);
+
+    $this->shop = $shopModel;
+    $this->name = $shopModel->name;
+    $this->description = $shopModel->description;
+    $this->address = $shopModel->address;
+    $this->contact = $shopModel->contact;
+    $this->sns_link = $shopModel->sns_links['sns'] ?? '';
+    $this->opening_time = \Carbon\Carbon::parse($shopModel->opening_time)->format('H:i');
+    $this->closing_time = \Carbon\Carbon::parse($shopModel->closing_time)->format('H:i');
+
+    // 既存の画像を表示用に設定
+    $this->existingImages = $shopModel->images;
 });
 
 // フォームの状態
 state([
+    'shop' => null,
     'name' => '',
     'description' => '',
     'address' => '',
@@ -27,6 +43,8 @@ state([
     'closing_time' => '21:00',
     'images' => [],
     'imageTypes' => [],
+    'existingImages' => collect(),
+    'imagesToDelete' => [],
 ]);
 
 // バリデーションルール
@@ -48,14 +66,28 @@ $addImage = function () {
     $this->imageTypes[] = 'exterior';
 };
 
-// 画像を削除
+// 新しい画像を削除
 $removeImage = function ($index) {
     array_splice($this->images, $index, 1);
     array_splice($this->imageTypes, $index, 1);
 };
 
-// お店を登録
-$createShop = function () {
+// 既存の画像を削除マークする
+$markImageForDeletion = function ($imageId) {
+    if (!in_array($imageId, $this->imagesToDelete)) {
+        $this->imagesToDelete[] = $imageId;
+    }
+};
+
+// 既存の画像の削除マークを取り消す
+$unmarkImageForDeletion = function ($imageId) {
+    $this->imagesToDelete = array_filter($this->imagesToDelete, function ($id) use ($imageId) {
+        return $id !== $imageId;
+    });
+};
+
+// お店を更新
+$updateShop = function () {
     $this->validate();
 
     $snsLinks = [];
@@ -63,7 +95,8 @@ $createShop = function () {
         $snsLinks['sns'] = $this->sns_link;
     }
 
-    $shop = Shop::create([
+    // お店情報を更新
+    $this->shop->update([
         'name' => $this->name,
         'description' => $this->description,
         'address' => $this->address,
@@ -73,22 +106,31 @@ $createShop = function () {
         'closing_time' => $this->closing_time,
     ]);
 
-    // 画像を保存
+    // 削除マークされた画像を削除
+    foreach ($this->imagesToDelete as $imageId) {
+        $image = ShopImage::find($imageId);
+        if ($image) {
+            Storage::disk('public')->delete($image->image_path);
+            $image->delete();
+        }
+    }
+
+    // 新しい画像を保存
     foreach ($this->images as $index => $image) {
         if ($image) {
             $path = $image->store('shop-images', 'public');
 
             ShopImage::create([
-                'shop_id' => $shop->id,
+                'shop_id' => $this->shop->id,
                 'image_path' => $path,
                 'image_type' => $this->imageTypes[$index] ?? 'exterior',
             ]);
         }
     }
 
-    session()->flash('success', 'お店を登録しました！');
+    session()->flash('success', 'お店の情報を更新しました！');
 
-    return redirect()->route('shops.index');
+    return redirect()->route('shops.show', $this->shop);
 };
 
 // 画像タイプの選択肢を提供
@@ -108,19 +150,20 @@ with([
         <!-- ページヘッダー -->
         <div class="text-center mb-8">
             <div
-                class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full mb-4 shadow-lg">
+                class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full mb-4 shadow-lg">
                 <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                     </path>
                 </svg>
             </div>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">朝活お店登録</h1>
-            <p class="text-lg text-gray-600">朝から営業するお店の情報を登録してください</p>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">お店情報編集</h1>
+            <p class="text-lg text-gray-600">{{ $shop->name }}の情報を編集してください</p>
         </div>
 
-        <!-- 登録フォーム -->
+        <!-- 編集フォーム -->
         <div class="bg-white rounded-2xl shadow-xl p-8 border border-orange-100">
-            <form wire:submit="createShop" enctype="multipart/form-data">
+            <form wire:submit="updateShop" enctype="multipart/form-data">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- 店舗名 -->
                     <div class="md:col-span-2">
@@ -276,7 +319,7 @@ with([
                     </div>
 
                     <!-- SNSリンク -->
-                    <div>
+                    <div class="md:col-span-2">
                         <label for="sns_link"
                             class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
                             <svg class="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor"
@@ -295,7 +338,69 @@ with([
                         @enderror
                     </div>
 
-                    <!-- 店舗画像 -->
+                    <!-- 既存の画像 -->
+                    @if ($existingImages->count() > 0)
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                既存の画像
+                            </label>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                @foreach ($existingImages as $image)
+                                    <div class="relative group">
+                                        <div
+                                            class="border-2 rounded-xl overflow-hidden {{ in_array($image->id, $imagesToDelete) ? 'border-red-300 opacity-50' : 'border-gray-200' }}">
+                                            <img src="{{ $image->image_url }}" alt="{{ $shop->name }}"
+                                                class="w-full h-32 object-cover">
+                                            <div class="p-2 bg-gray-50">
+                                                <p class="text-xs text-gray-600 text-center">
+                                                    {{ \App\Models\ShopImage::$availableTypes[$image->image_type] ?? $image->image_type }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        @if (in_array($image->id, $imagesToDelete))
+                                            <div
+                                                class="absolute inset-0 bg-red-500 bg-opacity-20 flex items-center justify-center">
+                                                <span class="text-red-600 font-semibold text-sm">削除予定</span>
+                                            </div>
+                                            <button type="button"
+                                                wire:click="unmarkImageForDeletion({{ $image->id }})"
+                                                class="absolute top-2 right-2 w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        @else
+                                            <button type="button"
+                                                wire:click="markImageForDeletion({{ $image->id }})"
+                                                class="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- 新しい画像を追加 -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
                             <svg class="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor"
@@ -304,7 +409,7 @@ with([
                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                 </path>
                             </svg>
-                            店舗画像
+                            新しい画像を追加
                         </label>
 
                         <!-- 画像アップロードエリア -->
@@ -369,7 +474,7 @@ with([
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                         </path>
                                     </svg>
-                                    <p class="text-gray-600 mb-4">まだ画像が追加されていません</p>
+                                    <p class="text-gray-600 mb-4">新しい画像を追加する場合は下のボタンを押してください</p>
                                 </div>
                             @endforelse
 
@@ -396,7 +501,7 @@ with([
 
                 <!-- アクションボタン -->
                 <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-                    <a href="{{ route('shops.index') }}"
+                    <a href="{{ route('shops.show', $shop) }}"
                         class="inline-flex items-center px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -406,12 +511,13 @@ with([
                     </a>
 
                     <button type="submit"
-                        class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                            </path>
                         </svg>
-                        お店を登録する
+                        更新する
                     </button>
                 </div>
             </form>

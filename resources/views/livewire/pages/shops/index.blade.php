@@ -227,10 +227,10 @@ $resetFilters = function () {
 
                         <!-- アクションボタン -->
                         <div class="flex space-x-3">
-                            <button
-                                class="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            <a href="{{ route('shops.show', $shop) }}"
+                                class="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center">
                                 詳細を見る
-                            </button>
+                            </a>
                             @if ($shop->contact)
                                 <a href="tel:{{ $shop->contact }}"
                                     class="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
