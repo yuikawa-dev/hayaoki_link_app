@@ -109,11 +109,11 @@ state([
             <!-- イベントを探すボタン -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 h-full flex items-center justify-center">
-                    <button
+                    <a href="{{ route('events.index') }}"
                         class="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-lg hover:shadow-xl hover:bg-gradient-to-br hover:from-indigo-500 hover:to-pink-600">
                         <i class="fas fa-calendar-alt text-4xl mb-2"></i>
                         <span class="text-lg font-semibold">イベントを探す</span>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

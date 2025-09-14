@@ -12,6 +12,8 @@ Volt::route('shops', 'pages.shops.index')->name('shops.index');
 Volt::route('shops/create', 'pages.shops.create')->name('shops.create')->middleware('auth');
 Volt::route('shops/{shop}', 'pages.shops.show')->name('shops.show');
 Volt::route('shops/{shop}/edit', 'pages.shops.edit')->name('shops.edit')->middleware('auth');
+Volt::route('events', 'pages.events.index')->name('events.index');
+Volt::route('events/{event}', 'pages.events.show')->name('events.show');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

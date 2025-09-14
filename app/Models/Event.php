@@ -80,4 +80,54 @@ class Event extends Model
     {
         return $this->fee > 0 ? '¥' . number_format($this->fee) : '無料';
     }
+
+    // 検索用スコープ
+    public function scopeSearchByName($query, $search)
+    {
+        if (!empty($search)) {
+            return $query->where('name', 'like', '%' . $search . '%');
+        }
+        return $query;
+    }
+
+    public function scopeSearchByLocation($query, $location)
+    {
+        if (!empty($location)) {
+            return $query->where('location', 'like', '%' . $location . '%');
+        }
+        return $query;
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('start_time', '>', now());
+    }
+
+    public function scopeToday($query)
+    {
+        return $query->whereDate('start_time', today());
+    }
+
+    public function scopeThisWeek($query)
+    {
+        return $query->whereBetween('start_time', [now()->startOfWeek(), now()->endOfWeek()]);
+    }
+
+    public function scopeByFeeRange($query, $feeRange)
+    {
+        switch ($feeRange) {
+            case 'free':
+                return $query->where('fee', 0);
+            case 'paid':
+                return $query->where('fee', '>', 0);
+            case 'low':
+                return $query->whereBetween('fee', [1, 1000]);
+            case 'medium':
+                return $query->whereBetween('fee', [1001, 3000]);
+            case 'high':
+                return $query->where('fee', '>', 3000);
+            default:
+                return $query;
+        }
+    }
 }
