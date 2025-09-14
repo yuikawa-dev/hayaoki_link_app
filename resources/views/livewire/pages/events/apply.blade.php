@@ -126,7 +126,21 @@ $applyEvent = function () {
                     </div>
                 </div>
 
-                <!-- エラーメッセージ -->
+                <!-- メッセージ表示 -->
+                @if (session('success'))
+                    <div class="mb-6 bg-green-50 border border-green-200 rounded-xl p-4">
+                        <div class="flex">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <p class="ml-3 text-green-700">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                @endif
+
                 @if (session('error'))
                     <div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
                         <div class="flex">

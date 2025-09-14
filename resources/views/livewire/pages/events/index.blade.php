@@ -2,6 +2,8 @@
 
 use function Livewire\Volt\{state, computed, mount};
 use App\Models\Event;
+use App\Models\EventRegistration;
+use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
 
 // 検索条件のstate
@@ -46,6 +48,18 @@ $resetFilters = function () {
     $this->location = '';
     $this->dateFilter = 'all';
     $this->feeRange = 'all';
+};
+
+// 指定されたイベントに申し込み済みかチェック
+$hasApplied = function ($eventId) {
+    if (!Auth::check()) {
+        return false;
+    }
+
+    return EventRegistration::where('event_id', $eventId)
+        ->where('user_id', Auth::id())
+        ->whereIn('status', [EventRegistration::STATUS_PENDING, EventRegistration::STATUS_CONFIRMED])
+        ->exists();
 };
 
 ?>
@@ -220,8 +234,20 @@ $resetFilters = function () {
                             </span>
                         </div>
 
-                        <!-- 空き状況バッジ -->
-                        @if ($event->hasAvailableSlots())
+                        <!-- 申し込み状況・空き状況バッジ -->
+                        @if ($this->hasApplied($event->id))
+                            <div class="absolute top-3 right-3">
+                                <span
+                                    class="inline-flex items-center px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full shadow-lg">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    申込済
+                                </span>
+                            </div>
+                        @elseif ($event->hasAvailableSlots())
                             <div class="absolute top-3 right-3">
                                 <span
                                     class="inline-flex items-center px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full shadow-lg">
@@ -287,13 +313,25 @@ $resetFilters = function () {
 
                         <!-- アクションボタン -->
                         <div class="flex space-x-3">
-                            <a href="{{ route('events.show', $event) }}"
-                                class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center">
-                                詳細を見る
-                            </a>
+                            @if ($this->hasApplied($event->id))
+                                <a href="{{ route('events.show', $event) }}"
+                                    class="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center flex items-center justify-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    申込済み
+                                </a>
+                            @else
+                                <a href="{{ route('events.show', $event) }}"
+                                    class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center">
+                                    詳細を見る
+                                </a>
+                            @endif
                             @if ($event->contact)
                                 <a href="mailto:{{ $event->contact }}"
-                                    class="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
+                                    class="px-4 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">

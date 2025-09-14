@@ -2,6 +2,7 @@
 
 use function Livewire\Volt\{state, computed, mount};
 use App\Models\Event;
+use App\Models\EventRegistration;
 use Illuminate\Support\Facades\Auth;
 
 // イベントのIDを受け取る
@@ -15,6 +16,18 @@ mount(function ($event) {
 // 現在のユーザーが管理者かどうかを判定
 $isAdmin = computed(function () {
     return Auth::check() && Auth::user()->isAdmin();
+});
+
+// 既に申し込み済みかチェック
+$hasApplied = computed(function () {
+    if (!Auth::check()) {
+        return false;
+    }
+
+    return EventRegistration::where('event_id', $this->event->id)
+        ->where('user_id', Auth::id())
+        ->whereIn('status', [EventRegistration::STATUS_PENDING, EventRegistration::STATUS_CONFIRMED])
+        ->exists();
 });
 
 // イベントを削除する
@@ -123,6 +136,21 @@ $deleteEvent = function () {
 
             <!-- イベント詳細情報 -->
             <div class="p-8">
+                <!-- 成功メッセージ -->
+                @if (session('success'))
+                    <div class="mb-6 bg-green-50 border border-green-200 rounded-xl p-4">
+                        <div class="flex">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <p class="ml-3 text-green-700">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- イベント名 -->
                 <div class="mb-6">
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $event->name }}</h1>
@@ -294,7 +322,28 @@ $deleteEvent = function () {
                 @endif
 
                 <!-- 参加申込ボタン -->
-                @if (!$event->isFinished() && $event->hasAvailableSlots())
+                @if ($this->hasApplied)
+                    <div class="text-center">
+                        <div
+                            class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-lg font-bold rounded-xl shadow-lg cursor-default">
+                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            申し込み済み
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">このイベントに申し込み済みです</p>
+                    </div>
+                @elseif ($event->isFinished())
+                    <div class="text-center">
+                        <p class="text-lg text-gray-500 font-semibold">このイベントは終了しました</p>
+                    </div>
+                @elseif (!$event->hasAvailableSlots())
+                    <div class="text-center">
+                        <p class="text-lg text-red-600 font-semibold">満員のため参加申込を受け付けていません</p>
+                    </div>
+                @else
                     <div class="text-center">
                         <a href="{{ route('events.apply', $event->id) }}"
                             class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-lg font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
@@ -304,14 +353,6 @@ $deleteEvent = function () {
                             </svg>
                             このイベントに参加申込する
                         </a>
-                    </div>
-                @elseif ($event->isFinished())
-                    <div class="text-center">
-                        <p class="text-lg text-gray-500 font-semibold">このイベントは終了しました</p>
-                    </div>
-                @else
-                    <div class="text-center">
-                        <p class="text-lg text-red-600 font-semibold">満員のため参加申込を受け付けていません</p>
                     </div>
                 @endif
             </div>
