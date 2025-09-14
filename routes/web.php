@@ -15,6 +15,7 @@ Volt::route('shops/{shop}/edit', 'pages.shops.edit')->name('shops.edit')->middle
 Volt::route('events', 'pages.events.index')->name('events.index');
 Volt::route('events/create', 'pages.events.create')->name('events.create')->middleware('auth');
 Volt::route('events/{event}', 'pages.events.show')->name('events.show');
+Volt::route('events/{event}/edit', 'pages.events.edit')->name('events.edit')->middleware('auth');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
