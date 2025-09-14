@@ -35,4 +35,13 @@ class ShopImage extends Model
     {
         return $this->belongsTo(Shop::class);
     }
+
+    // 画像URLを取得するアクセサ
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        return null;
+    }
 }

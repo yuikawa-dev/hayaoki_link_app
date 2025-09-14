@@ -105,11 +105,9 @@ $resetFilters = function () {
                     </label>
                     <select id="morningTime" wire:model.live="morningTime"
                         class="w-full px-4 py-3 border-2 border-orange-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all duration-200 hover:border-orange-300 text-gray-900">
-                        <option value="06:00">6:00まで</option>
-                        <option value="07:00">7:00まで</option>
-                        <option value="08:00">8:00まで</option>
                         <option value="09:00">9:00まで</option>
                         <option value="10:00">10:00まで</option>
+                        <option value="11:00">11:00まで</option>
                     </select>
                 </div>
 
@@ -156,9 +154,23 @@ $resetFilters = function () {
                     class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-orange-100 hover:border-orange-200">
                     <!-- 店舗画像 -->
                     <div class="relative">
-                        @if ($shop->getMainImage())
-                            <img src="{{ $shop->getMainImage()->image_url }}" alt="{{ $shop->name }}"
-                                class="w-full h-48 object-cover">
+                        @php
+                            $mainImage = $shop->getMainImage();
+                        @endphp
+                        @if ($mainImage)
+                            <img src="{{ $mainImage->image_url }}" alt="{{ $shop->name }}"
+                                class="w-full h-48 object-cover"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div
+                                class="w-full h-48 flex-col items-center justify-center bg-gradient-to-br from-orange-400 via-amber-500 to-yellow-500 hidden">
+                                <svg class="w-12 h-12 text-white drop-shadow-lg mb-2" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                                    </path>
+                                </svg>
+                                <span class="text-white text-xs">画像読み込みエラー</span>
+                            </div>
                         @else
                             <div
                                 class="w-full h-48 flex items-center justify-center bg-gradient-to-br from-orange-400 via-amber-500 to-yellow-500">

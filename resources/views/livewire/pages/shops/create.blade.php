@@ -1,8 +1,13 @@
 <?php
 
-use function Livewire\Volt\{state, mount, rules};
+use function Livewire\Volt\{state, mount, rules, with, uses};
 use App\Models\Shop;
+use App\Models\ShopImage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
+
+uses([WithFileUploads::class]);
 
 // 管理者チェック
 mount(function () {
@@ -21,6 +26,8 @@ state([
     'instagram' => '',
     'opening_time' => '06:00',
     'closing_time' => '21:00',
+    'images' => [],
+    'imageTypes' => [],
 ]);
 
 // バリデーションルール
@@ -33,7 +40,21 @@ rules([
     'instagram' => 'nullable|string|max:255',
     'opening_time' => 'required|date_format:H:i',
     'closing_time' => 'required|date_format:H:i|after:opening_time',
+    'images.*' => 'nullable|image|max:2048',
+    'imageTypes.*' => 'nullable|string|in:exterior,interior,menu,atmosphere',
 ]);
+
+// 画像を追加
+$addImage = function () {
+    $this->images[] = null;
+    $this->imageTypes[] = 'exterior';
+};
+
+// 画像を削除
+$removeImage = function ($index) {
+    array_splice($this->images, $index, 1);
+    array_splice($this->imageTypes, $index, 1);
+};
 
 // お店を登録
 $createShop = function () {
@@ -47,7 +68,7 @@ $createShop = function () {
         $snsLinks['instagram'] = $this->instagram;
     }
 
-    Shop::create([
+    $shop = Shop::create([
         'name' => $this->name,
         'description' => $this->description,
         'address' => $this->address,
@@ -57,10 +78,33 @@ $createShop = function () {
         'closing_time' => $this->closing_time,
     ]);
 
+    // 画像を保存
+    foreach ($this->images as $index => $image) {
+        if ($image) {
+            $path = $image->store('shop-images', 'public');
+
+            ShopImage::create([
+                'shop_id' => $shop->id,
+                'image_path' => $path,
+                'image_type' => $this->imageTypes[$index] ?? 'exterior',
+            ]);
+        }
+    }
+
     session()->flash('success', 'お店を登録しました！');
 
     return redirect()->route('shops.index');
 };
+
+// 画像タイプの選択肢を提供
+with([
+    'availableImageTypes' => [
+        'exterior' => '外観',
+        'interior' => '内装',
+        'menu' => 'メニュー',
+        'atmosphere' => '雰囲気',
+    ],
+]);
 
 ?>
 
@@ -81,7 +125,7 @@ $createShop = function () {
 
         <!-- 登録フォーム -->
         <div class="bg-white rounded-2xl shadow-xl p-8 border border-orange-100">
-            <form wire:submit="createShop">
+            <form wire:submit="createShop" enctype="multipart/form-data">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- 店舗名 -->
                     <div class="md:col-span-2">
@@ -233,6 +277,104 @@ $createShop = function () {
                         @error('instagram')
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                         @enderror
+                    </div>
+
+                    <!-- 店舗画像 -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            店舗画像
+                        </label>
+
+                        <!-- 画像アップロードエリア -->
+                        <div class="space-y-4">
+                            @forelse($images as $index => $image)
+                                <div
+                                    class="border-2 border-dashed border-orange-200 rounded-xl p-6 bg-orange-50/50 hover:border-orange-300 transition-all duration-200">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                        <!-- 画像タイプ選択 -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">画像の種類</label>
+                                            <select wire:model="imageTypes.{{ $index }}"
+                                                class="w-full px-3 py-2 border-2 border-orange-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all duration-200 text-gray-900">
+                                                @foreach ($availableImageTypes as $key => $label)
+                                                    <option value="{{ $key }}">{{ $label }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- 画像選択 -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">画像ファイル</label>
+                                            <input type="file" wire:model="images.{{ $index }}"
+                                                accept="image/*"
+                                                class="w-full px-3 py-2 border-2 border-orange-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all duration-200 text-gray-900 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                                        </div>
+
+                                        <!-- 削除ボタン -->
+                                        <div>
+                                            <button type="button" wire:click="removeImage({{ $index }})"
+                                                class="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                                削除
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    @if ($image)
+                                        <div class="mt-4">
+                                            <div class="text-sm text-gray-600 mb-2">プレビュー:</div>
+                                            <img src="{{ $image->temporaryUrl() }}" alt="プレビュー"
+                                                class="h-24 w-24 object-cover rounded-lg border-2 border-orange-200">
+                                        </div>
+                                    @endif
+
+                                    @error('images.' . $index)
+                                        <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            @empty
+                                <div
+                                    class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50/50">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <p class="text-gray-600 mb-4">まだ画像が追加されていません</p>
+                                </div>
+                            @endforelse
+
+                            <!-- 画像追加ボタン -->
+                            <div class="text-center">
+                                <button type="button" wire:click="addImage"
+                                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-400 to-amber-400 hover:from-orange-500 hover:to-amber-500 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    画像を追加
+                                </button>
+                            </div>
+
+                            <div class="text-sm text-gray-500 text-center">
+                                <p>※ 1つのファイルにつき最大2MBまで</p>
+                                <p>※ JPG、PNG、GIF形式に対応</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
