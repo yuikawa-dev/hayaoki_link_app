@@ -195,15 +195,22 @@ $resetFilters = function () {
                     class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-100 hover:border-blue-200">
                     <!-- イベントのヘッダー部分 -->
                     <div class="relative">
-                        <div
-                            class="w-full h-48 flex items-center justify-center bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-500">
-                            <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                        </div>
+                        @if ($event->hasImage())
+                            <div class="w-full h-48 overflow-hidden">
+                                <img src="{{ $event->getImageUrl() }}" alt="{{ $event->name }}"
+                                    class="w-full h-full object-cover">
+                            </div>
+                        @else
+                            <div
+                                class="w-full h-48 flex items-center justify-center bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-500">
+                                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                        @endif
 
                         <!-- 参加費バッジ -->
                         <div class="absolute top-3 left-3">

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -14,6 +15,7 @@ class Event extends Model
     protected $fillable = [
         'name',
         'description',
+        'image_path',
         'start_time',
         'end_time',
         'location',
@@ -79,6 +81,21 @@ class Event extends Model
     public function getFormattedFee()
     {
         return $this->fee > 0 ? '¥' . number_format($this->fee) : '無料';
+    }
+
+    // 画像URLを取得
+    public function getImageUrl()
+    {
+        if ($this->image_path && Storage::disk('public')->exists($this->image_path)) {
+            return asset('storage/' . $this->image_path);
+        }
+        return null;
+    }
+
+    // 画像が存在するかチェック
+    public function hasImage()
+    {
+        return !empty($this->image_path) && Storage::disk('public')->exists($this->image_path);
     }
 
     // 検索用スコープ

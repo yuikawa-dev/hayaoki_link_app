@@ -12,6 +12,7 @@ class EventFactory extends Factory
         return [
             'name' => fake()->words(3, true),
             'description' => fake()->paragraph(),
+            'image_path' => fake()->randomElement([null, 'events/sample-event-image.jpg']),
             'start_time' => $startTime,
             'end_time' => fake()->dateTimeBetween($startTime, $startTime->format('Y-m-d H:i:s') . ' +3 hours'),
             'location' => fake()->address(),
