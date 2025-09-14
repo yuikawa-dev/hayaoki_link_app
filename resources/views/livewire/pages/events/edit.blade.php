@@ -140,11 +140,11 @@ $deleteImage = function () {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- イベント名 -->
                     <div class="md:col-span-2">
-                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="name" class="block text-sm font-semibold text-black mb-2">
                             イベント名 <span class="text-red-500">*</span>
                         </label>
                         <input wire:model="name" type="text" id="name" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black"
                             placeholder="イベント名を入力してください">
                         @error('name')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -153,11 +153,11 @@ $deleteImage = function () {
 
                     <!-- 開始日時 -->
                     <div>
-                        <label for="start_time" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="start_time" class="block text-sm font-semibold text-black mb-2">
                             開始日時 <span class="text-red-500">*</span>
                         </label>
                         <input wire:model="start_time" type="datetime-local" id="start_time" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300">
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black">
                         @error('start_time')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -165,11 +165,11 @@ $deleteImage = function () {
 
                     <!-- 終了日時 -->
                     <div>
-                        <label for="end_time" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="end_time" class="block text-sm font-semibold text-black mb-2">
                             終了日時 <span class="text-red-500">*</span>
                         </label>
                         <input wire:model="end_time" type="datetime-local" id="end_time" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300">
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black">
                         @error('end_time')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -177,13 +177,13 @@ $deleteImage = function () {
 
                     <!-- 参加費 -->
                     <div>
-                        <label for="fee" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="fee" class="block text-sm font-semibold text-black mb-2">
                             参加費 <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
                             <input wire:model="fee" type="number" id="fee" required min="0"
-                                class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                                class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black"
                                 placeholder="0">
                         </div>
                         @error('fee')
@@ -193,12 +193,12 @@ $deleteImage = function () {
 
                     <!-- 定員 -->
                     <div>
-                        <label for="capacity" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="capacity" class="block text-sm font-semibold text-black mb-2">
                             定員 <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <input wire:model="capacity" type="number" id="capacity" required min="1"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black"
                                 placeholder="10">
                             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">名</span>
                         </div>
@@ -210,11 +210,11 @@ $deleteImage = function () {
 
                 <!-- 開催場所 -->
                 <div>
-                    <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="location" class="block text-sm font-semibold text-black mb-2">
                         開催場所 <span class="text-red-500">*</span>
                     </label>
                     <input wire:model="location" type="text" id="location" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black"
                         placeholder="開催場所を入力してください">
                     @error('location')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -223,11 +223,11 @@ $deleteImage = function () {
 
                 <!-- 連絡先 -->
                 <div>
-                    <label for="contact" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="contact" class="block text-sm font-semibold text-black mb-2">
                         連絡先 <span class="text-red-500">*</span>
                     </label>
                     <input wire:model="contact" type="text" id="contact" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black"
                         placeholder="連絡先を入力してください（電話番号など）">
                     @error('contact')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -236,11 +236,11 @@ $deleteImage = function () {
 
                 <!-- イベント説明 -->
                 <div>
-                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="description" class="block text-sm font-semibold text-black mb-2">
                         イベント説明 <span class="text-red-500">*</span>
                     </label>
                     <textarea wire:model="description" id="description" rows="6" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 resize-none"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 resize-none text-black"
                         placeholder="イベントの詳細な説明を入力してください"></textarea>
                     @error('description')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -249,11 +249,11 @@ $deleteImage = function () {
 
                 <!-- 参加条件・注意事項 -->
                 <div>
-                    <label for="requirements" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="requirements" class="block text-sm font-semibold text-black mb-2">
                         参加条件・注意事項
                     </label>
                     <textarea wire:model="requirements" id="requirements" rows="4"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 resize-none"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 resize-none text-black"
                         placeholder="参加条件や注意事項があれば入力してください（任意）"></textarea>
                     @error('requirements')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -262,7 +262,7 @@ $deleteImage = function () {
 
                 <!-- 画像アップロード -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label class="block text-sm font-semibold text-black mb-2">
                         イベント画像
                     </label>
 
@@ -280,7 +280,7 @@ $deleteImage = function () {
                                     </svg>
                                 </button>
                             </div>
-                            <p class="text-sm text-gray-600 mt-2">現在の画像</p>
+                            <p class="text-sm text-black mt-2">現在の画像</p>
                         </div>
                     @endif
 
@@ -296,7 +296,7 @@ $deleteImage = function () {
                                         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
                                     </path>
                                 </svg>
-                                <div class="text-gray-600">
+                                <div class="text-black">
                                     <span
                                         class="font-semibold text-orange-600 hover:text-orange-500">クリックして画像を選択</span>
                                     <p class="text-sm">PNG, JPG, GIF (最大10MB)</p>
@@ -309,7 +309,7 @@ $deleteImage = function () {
                         <div class="mt-4">
                             <img src="{{ $image->temporaryUrl() }}" alt="プレビュー"
                                 class="w-32 h-32 object-cover rounded-xl shadow-md">
-                            <p class="text-sm text-gray-600 mt-2">新しい画像のプレビュー</p>
+                            <p class="text-sm text-black mt-2">新しい画像のプレビュー</p>
                         </div>
                     @endif
 
