@@ -1,12 +1,26 @@
 <?php
 
-use function Livewire\Volt\{state};
+use function Livewire\Volt\{state, computed};
 use App\Models\Event;
 use App\Models\EventRegistration;
+use Livewire\WithPagination;
 
-state([
-    'registeredEvents' => fn() => auth()->user()->registeredEvents()->orderBy('start_time')->paginate(10),
-]);
+state(['currentPage' => 1]);
+state(['perPage' => 10]);
+
+// ページ変更時のイベントハンドラ
+$updatedCurrentPage = function ($value) {
+    $this->currentPage = $value;
+};
+
+// イベントキャンセル後のイベントハンドラ
+$eventCancelled = function () {
+    $this->currentPage = 1;
+};
+
+$registeredEvents = computed(function () {
+    return auth()->user()->registeredEvents()->orderBy('start_time')->paginate($this->perPage);
+});
 
 $cancelRegistration = function ($eventId) {
     $registration = EventRegistration::where('event_id', $eventId)
@@ -15,7 +29,7 @@ $cancelRegistration = function ($eventId) {
 
     if ($registration) {
         $registration->update(['status' => 'cancelled']);
-        $this->registeredEvents = auth()->user()->registeredEvents()->orderBy('start_time')->paginate(10);
+        $this->dispatch('event-cancelled');
     }
 };
 
@@ -25,15 +39,25 @@ $cancelRegistration = function ($eventId) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-6">
-                    参加イベント一覧
-                </h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-medium text-gray-900">
+                        参加イベント一覧
+                    </h2>
+                    <a href="{{ route('mypage') }}"
+                        class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        マイページに戻る
+                    </a>
+                </div>
 
-                @if ($registeredEvents->isEmpty())
+                @if ($this->registeredEvents->isEmpty())
                     <p class="text-gray-500 text-center py-4">参加予定のイベントはありません</p>
                 @else
                     <div class="space-y-6">
-                        @foreach ($registeredEvents as $event)
+                        @foreach ($this->registeredEvents as $event)
                             <div class="border-b pb-6 last:border-b-0 last:pb-0">
                                 <div class="flex justify-between items-start">
                                     <div>
@@ -90,7 +114,7 @@ $cancelRegistration = function ($eventId) {
                     </div>
 
                     <div class="mt-6">
-                        {{ $registeredEvents->links() }}
+                        {{ $this->registeredEvents->links(data: ['current-page' => $this->currentPage]) }}
                     </div>
                 @endif
             </div>
